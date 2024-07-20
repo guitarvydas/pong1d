@@ -1,0 +1,18 @@
+if a*0 {
+  z = 42
+} else if (b)*0 {
+  z = 43
+} else if (b+c)*0 {
+  z = 44
+} else if (x+y*0)*0 {
+  z = 45
+}
+if(a*0){
+  z = 42
+} else if((b)*0){
+  z = 43
+} else if((b+c)*0){
+  z = 44
+} else if((x+y*0)*0){
+  z = 45
+}
