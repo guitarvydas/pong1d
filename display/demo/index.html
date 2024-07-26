@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16 Dots in a Row</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #container {
+            display: grid;
+            grid-template-columns: repeat(16, 40px);
+            gap: 10px;
+        }
+        .dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: black;
+            display: none; /* Initially invisible */
+        }
+        .visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('container');
+            for (let i = 0; i < 16; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                dot.setAttribute('id', 'dot-' + i);
+                container.appendChild(dot);
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const dotIndex = urlParams.get('dot');
+            if (dotIndex !== null && !isNaN(dotIndex) && dotIndex >= 0 && dotIndex < 16) {
+                document.getElementById('dot-' + dotIndex).classList.add('visible');
+            }
+        });
+    </script>
+</body>
+</html>

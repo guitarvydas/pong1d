@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Scanner</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .bar { display: flex; }
+      .led { width: 32px; height: 32px; background: #644; }
+      .on  { background: #f22; }
+    </style>
+  </head>
+  <body>
+    <h1><a href="https://en.wikipedia.org/wiki/Glen_A._Larson">Larson Scanner</a></h1>
+    <p>You should see swept display under here.</p>
+    <div class="bar">
+      <div id="led0"></div>
+      <div id="led1"></div>
+      <div id="led2"></div>
+      <div id="led3"></div>
+      <div id="led4"></div>
+      <div id="led5"></div>
+      <div id="led6"></div>
+      <div id="led7"></div>
+      <div id="led8"></div>
+      <div id="led9"></div>
+    </div>
+    <p>Direction flip-flop: <div id="ffmon"></div></p>
+    
+    <script>
+      var MASTER = 0; // Master counter for ticks.
+
+      // I/O as FIFO queues in dictionary.
+      
+      function outp(which, value) {
+	  for(var i = 0; i < wires.length; i += 1) {
+	      if(which == wires[i][0]) {
+		  const key = wires[i][1];
+		  if(!qq[key]) { qq[key] = []; }
+		  if(qq[key].length > 5) { qq[key] = []; } // Clear stale signals.
+		  qq[key].push(value);
+	      }
+	  }
+      }
+
+      function inp(which) {
+	  if(qq[which]) {
+	      return qq[which].shift();
+	  } else {
+	      return undefined;
+	  }
+      }
+
+      // Chips.
+      
+      function TICK(name) {
+	  // ( name --) Clock generator.
+	  
+	  if(0 == MASTER % 10) {
+	      outp(`${name}:OUT`, true);
+	  }
+	  MASTER += 1;
+      }
+
+      function COUNT(name, state) {
+	  state = state || [0, false];
+	  var [n, reverse] = state;
+	  if(inp(`${name}:REVERSE`)) {
+	      reverse = !reverse;
+ 	  }
+	  if(inp(`${name}:ADV`)) {
+	      outp(`${name}:N`, n);
+	      if(reverse) { n += -1; }
+	      else { n += 1; }
+	  }
+	  return [n, reverse];
+      }
+
+      function FLIPFLOP(name, state) {
+	  state = state || false;
+	  if(inp(`${name}:J`)) {
+	      state = false;
+	  } else if(inp(`${name}:K`)) {
+	      state = true;
+	  }
+	  outp(`${name}:OUT`, state);
+	  return state;
+      }
+
+      function DECADE(name, state) {
+	  state = state || 0;
+	  if(inp(`${name}:ADV`)) {
+	      state = Math.abs(state % 10);
+	      outp(`${name}:N`, state);
+	      state += (inp(`${name}:REVERSE`) ? -1 : 1);
+	  }
+	  return state;
+      }
+
+      function DECODE(name, state) {
+	  var n = inp(`${name}:N`);
+	  if(undefined == n) {
+	      n = state;
+	  }
+	  if(0 <= n && n < 10) {
+	      outp(`${name}:${n % 10}`, true);
+	  }
+	  return n;
+      }
+
+      function LED(name) {
+	  // ( name --) Single LED display, updates div with id $name.
+	  
+	  const surface = document.getElementById(`${name}`);
+	  var klass = "led";
+	  if(surface) {
+	      if(inp(`${name}:IN`)) {
+		  klass = "led on";
+	      }
+	      surface.innerHTML = `<div class="${klass}">&nbsp;</div>`;
+	  }
+      }
+      
+      var qq = {};
+      var chips = [
+	  ["count1", DECADE],
+	  ["ff", FLIPFLOP],
+	  ["decode", DECODE],
+	  ["led0", LED],
+	  ["led1", LED],
+	  ["led2", LED],
+	  ["led3", LED],
+	  ["led4", LED],
+	  ["led5", LED],
+	  ["led6", LED],
+	  ["led7", LED],
+	  ["led8", LED],
+	  ["led9", LED],
+	  ["tick", TICK],
+	  ["ffmon", LED]
+      ];
+      var wires = [
+	  ["tick:OUT", "count1:ADV"],
+	  ["count1:N", "decode:N"],
+	  ["decode:0", "ff:J"],
+	  ["decode:8", "ff:K"], // Wire here (instead of 9) to acount for prop delay.
+	  ["ff:OUT", "count1:REVERSE"],
+	  ["ff:OUT", "ffmon:IN"],
+	  ["decode:0", "led0:IN"],
+	  ["decode:1", "led1:IN"],
+	  ["decode:2", "led2:IN"],
+	  ["decode:3", "led3:IN"],
+	  ["decode:4", "led4:IN"],
+	  ["decode:5", "led5:IN"],
+	  ["decode:6", "led6:IN"],
+	  ["decode:7", "led7:IN"],
+	  ["decode:8", "led8:IN"],
+	  ["decode:9", "led9:IN"],
+      ];
+
+      function step() {
+	  // ( --) Walks through all chips and evals.
+
+	  chips = chips.map((chip) => {
+	      [name, f, state] = chip;
+	      return [name, f, f(name, state)];
+	  });
+      }
+
+      function tickloop() {
+	  // ( --) Limits ticks to browser framerate so doesn't hang.
+	  
+	  step();
+	  window.requestAnimationFrame(tickloop);
+      }
+      window.requestAnimationFrame(tickloop);
+    </script>
+  </body>
+</html>

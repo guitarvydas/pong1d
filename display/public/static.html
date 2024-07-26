@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot Display</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #container {
+            display: grid;
+            grid-template-columns: repeat(18, 40px);
+            gap: 5px;
+        }
+        #bam-container {
+            display: grid;
+            grid-template-columns: repeat(18, 40px);
+            gap: 5px;
+        }
+        .dot, .bam {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: black;
+            display: 1;
+        }
+        .bam {
+            background-color: red;
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            font-size: 1.5em;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            display: 1;
+        }
+        #winner {
+            display: 'block';
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="bam" id="bam-0">LBAM!</div>
+        <!-- 16 positions -->
+        <div class="dot" id="dot-0"></div>
+        <div class="dot" id="dot-1"></div>
+        <div class="dot" id="dot-2"></div>
+        <div class="dot" id="dot-3"></div>
+        <div class="dot" id="dot-4"></div>
+        <div class="dot" id="dot-5"></div>
+        <div class="dot" id="dot-6"></div>
+        <div class="dot" id="dot-7"></div>
+        <div class="dot" id="dot-8"></div>
+        <div class="dot" id="dot-9"></div>
+        <div class="dot" id="dot-A"></div>
+        <div class="dot" id="dot-B"></div>
+        <div class="dot" id="dot-C"></div>
+        <div class="dot" id="dot-D"></div>
+        <div class="dot" id="dot-E"></div>
+        <div class="dot" id="dot-F"></div>
+        <!-- BAM positions -->
+        <div class="bam" id="bam-15">RBAM!</div>
+    </div>
+    <div id="winner"></div>
+    <!-- <script> -->
+    <!--     async function updateDisplay() { -->
+    <!--         const response = await fetch('/status'); -->
+    <!--         const data = await response.json(); -->
+
+    <!--         // Clear previous state -->
+    <!--         document.querySelectorAll('.dot').forEach(dot => dot.style.display = 'none'); -->
+    <!--         document.querySelectorAll('.bam').forEach(bam => bam.style.display = 'none'); -->
+    <!--         document.getElementById('winner').style.display = 'none'; -->
+
+    <!--         if (data.winner) { -->
+    <!--             document.getElementById('winner').innerText = data.winner; -->
+    <!--             document.getElementById('winner').style.display = 'block'; -->
+    <!--             return; -->
+    <!--         } -->
+
+    <!--         if (data.bamActive) { -->
+    <!--             document.getElementById(`bam-${data.bamPosition}`).style.display = 'flex'; -->
+    <!--         } else if (data.currentPosition !== null) { -->
+    <!--             document.getElementById(`dot-${data.currentPosition}`).style.display = 'block'; -->
+    <!--         } -->
+    <!--     } -->
+
+    <!--     setInterval(updateDisplay, 100); -->
+    <!-- </script> -->
+</body>
+</html>
