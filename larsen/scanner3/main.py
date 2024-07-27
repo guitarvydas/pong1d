@@ -20,7 +20,7 @@ def start_function (root_project, root_0D, arg, main_container):
 
 ## Leaf components for this project...
 def components_to_include_in_project (root_project, root_0D, reg):
-    zd.register_component (reg, zd.Template (name = "Tick", instantiator = tick))
+    zd.register_component (reg, zd.Template (name = "Delay", instantiator = delay))
     zd.register_component (reg, zd.Template (name = "Count", instantiator = count))
     zd.register_component (reg, zd.Template (name = "Reverser", instantiator = reverser))
     zd.register_component (reg, zd.Template (name = "Decode", instantiator = decode))
@@ -29,11 +29,15 @@ def components_to_include_in_project (root_project, root_0D, reg):
 
 
 ## Leaf component implementations
-def tick_handler (eh, msg):
-    send_bang (eh, "tick", msg)
-def tick (reg, owner, name, template_data):
-    name_with_id = zd.gensym ("Tick")
-    return zd.make_leaf (name_with_id, owner, None, tick_handler)
+import time
+def delay_handler (eh, msg):
+    time.sleep (0.2)
+    send_bang (eh, "", msg)
+def delay (reg, owner, name, template_data):
+    name_with_id = zd.gensym ("Delay")
+    eh = zd.make_leaf (name_with_id, owner, None, delay_handler)
+    zd.set_active (eh)
+    return eh
 
 class Counter:
     def __init__ (self):
@@ -116,10 +120,11 @@ def monitor (reg, owner, name, template_data):
     return zd.make_leaf (name=name_with_id, owner=owner, instance_data=None, handler=monitor_handler)
 def monitor_handler (eh, msg):
     s = msg.datum.srepr ()
-    if s == "0":
-        print (f"{s}", file=sys.stderr)
-    else:
-        print (f"{s}", end='', file=sys.stderr)
+    i = int (s)
+    while i > 0:
+        print (" ", end='')
+        i -= 1
+    print (f"{s}")
 
 
 

@@ -4,11 +4,11 @@
         "name": "main",
         "children": [
             {
-                "name": "Tick",
+                "name": "Delay",
                 "id": 4
             },
             {
-                "name": "bulk",
+                "name": "Larsen",
                 "id": 7
             }
         ],
@@ -21,20 +21,7 @@
                 },
                 "source_port": "start",
                 "target": {
-                    "name": "Tick",
-                    "id": 4
-                },
-                "target_port": ""
-            },
-            {
-                "dir": 1,
-                "source": {
-                    "name": "Tick",
-                    "id": 4
-                },
-                "source_port": "tick",
-                "target": {
-                    "name": "bulk",
+                    "name": "Larsen",
                     "id": 7
                 },
                 "target_port": "tick"
@@ -42,12 +29,25 @@
             {
                 "dir": 1,
                 "source": {
-                    "name": "bulk",
+                    "name": "Delay",
+                    "id": 4
+                },
+                "source_port": "",
+                "target": {
+                    "name": "Larsen",
+                    "id": 7
+                },
+                "target_port": "tick"
+            },
+            {
+                "dir": 1,
+                "source": {
+                    "name": "Larsen",
                     "id": 7
                 },
                 "source_port": "",
                 "target": {
-                    "name": "Tick",
+                    "name": "Delay",
                     "id": 4
                 },
                 "target_port": ""
@@ -56,7 +56,7 @@
     },
     {
         "file": "scanner3.drawio",
-        "name": "bulk",
+        "name": "Larsen",
         "children": [
             {
                 "name": "Count",
