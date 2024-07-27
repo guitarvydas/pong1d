@@ -20,7 +20,7 @@ def start_function (root_project, root_0D, arg, main_container):
 
 ## Leaf components for this project...
 def components_to_include_in_project (root_project, root_0D, reg):
-    zd.register_component (reg, zd.Template (name = "Tick", instantiator = tick))
+    zd.register_component (reg, zd.Template (name = "Delay", instantiator = delay))
     zd.register_component (reg, zd.Template (name = "Count", instantiator = count))
     zd.register_component (reg, zd.Template (name = "Reverser", instantiator = reverser))
     zd.register_component (reg, zd.Template (name = "Decode", instantiator = decode))
@@ -29,11 +29,6 @@ def components_to_include_in_project (root_project, root_0D, reg):
 
 
 ## Leaf component implementations
-def tick_handler (eh, msg):
-    send_bang (eh, "tick", msg)
-def tick (reg, owner, name, template_data):
-    name_with_id = zd.gensym ("Tick")
-    return zd.make_leaf (name_with_id, owner, None, tick_handler)
 
 class Counter:
     def __init__ (self):
@@ -116,11 +111,40 @@ def monitor (reg, owner, name, template_data):
     return zd.make_leaf (name=name_with_id, owner=owner, instance_data=None, handler=monitor_handler)
 def monitor_handler (eh, msg):
     s = msg.datum.srepr ()
-    if s == "0":
-        print (f"{s}", file=sys.stderr)
-    else:
-        print (f"{s}", end='', file=sys.stderr)
+    i = int (s)
+    while i > 0:
+        print (" ", end='')
+        i -= 1
+    print (f"{s}")
 
+    
+DELAYDELAY = 100000
+
+class Delay_Info:
+    def __init__ (self, counter=0, saved_message=None):
+        self.counter = counter
+        self.saved_message = saved_message
+
+def first_time (m):
+    return not zd.is_tick (m)
+
+def delay_handler (eh, msg):
+    info = eh.instance_data
+    if first_time (msg):
+        info.saved_message = msg
+        zd.set_active (eh) ## tell engine to keep running this component with 'ticks'
+    count = info.counter
+    count += 1
+    if count >= DELAYDELAY:
+        zd.set_idle (eh) ## tell engine that we're finally done
+        zd.forward (eh=eh, port="", msg=info.saved_message)
+        count = 0
+    info.counter = count
+
+def delay (reg, owner, name, template_data):
+    name_with_id = zd.gensym ("delay")
+    info = Delay_Info ()
+    return zd.make_leaf (name_with_id, owner, info, delay_handler)
 
 
 
