@@ -30,20 +30,27 @@ def components_to_include_in_project (root_project, root_0D, reg):
 
 ## Leaf component implementations
 
-counter = 0
-direction = 1
+class Counter:
+    def __init__ (self):
+        self.count = 0
+        self.direction = 1
+    def advance (self):
+        self.count += self.direction
+    def reverse (self):
+        self.direction = self.direction * -1
 def count_handler (eh, msg):
-    global counter, direction
+    inst = eh.instance_data
     if msg.port == "adv":
-        counter = counter + direction
-        send_int (eh, "", counter, msg)
+        inst.advance ()
+        send_int (eh, "", inst.count, msg)
     elif msg.port == "rev":
-        direction = direction * -1
+        inst.reverse ()
     else:
         panic (f'bad message to count {msg.port}')
 def count (reg, owner, name, template_data):
+    counter = Counter ()
     name_with_id = zd.gensym ("Count")
-    return zd.make_leaf (name_with_id, owner, None, count_handler)
+    return zd.make_leaf (name_with_id, owner, counter, count_handler)
 
 class ReverserState:
     def __init__ (self):
