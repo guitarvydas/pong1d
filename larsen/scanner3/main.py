@@ -45,29 +45,26 @@ def count (reg, owner, name, template_data):
     name_with_id = zd.gensym ("Count")
     return zd.make_leaf (name_with_id, owner, None, count_handler)
 
-class ReverserState:
-    def __init__ (self):
-        self.state = "J"
+reverser_state = "J"
 def reverser_handler (eh, msg):
-    inst = eh.instance_data
-    if inst.state == "K":
+    global reverser_state
+    if reverser_state == "K":
         if msg.port == "J":
             send_bang (eh, "", msg)
-            inst.state = "J"
+            reverser_state = "J"
         else:
             pass
-    elif inst.state == "J":
+    elif reverser_state == "J":
         if msg.port == "K":
             send_bang (eh, "", msg)
-            inst.state = "K"
+            reverser_state = "K"
         else:
             pass
     else:
         panic ("bad message to reverser handler")
 def reverser (reg, owner, name, template_data):
-    state = ReverserState ()
     name_with_id = zd.gensym ("Reverser")
-    return zd.make_leaf (name_with_id, owner, state, reverser_handler)
+    return zd.make_leaf (name_with_id, owner, None, reverser_handler)
 
 def decode_handler (eh, msg):
     i = int (msg.datum.raw ())
@@ -111,7 +108,7 @@ def monitor_handler (eh, msg):
     print (f"{s}")
 
     
-DELAYDELAY = 100000
+DELAYDELAY = 10000
 
 class Delay_Info:
     def __init__ (self, counter=0, saved_message=None):
