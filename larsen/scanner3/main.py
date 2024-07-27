@@ -24,6 +24,7 @@ def components_to_include_in_project (root_project, root_0D, reg):
     zd.register_component (reg, zd.Template (name = "Count", instantiator = count))
     zd.register_component (reg, zd.Template (name = "Reverser", instantiator = reverser))
     zd.register_component (reg, zd.Template (name = "Decode", instantiator = decode))
+    zd.register_component (reg, zd.Template (name = "👀", instantiator = monitor))
 
 
 
@@ -44,7 +45,6 @@ class Counter:
         self.direction = self.direction * -1
 def count_handler (eh, msg):
     inst = eh.instance_data
-    print (f'count gets {msg.port}')
     if msg.port == "adv":
         inst.advance ()
         send_int (eh, "", inst.count, msg)
@@ -62,7 +62,6 @@ class ReverserState:
         self.state = "J"
 def reverser_handler (eh, msg):
     inst = eh.instance_data
-    print (f'reverser handler in state {inst.state} gets {msg.port}')
     if inst.state == "K":
         if msg.port == "J":
             send_bang (eh, "", msg)
@@ -83,7 +82,6 @@ def reverser (reg, owner, name, template_data):
     return zd.make_leaf (name_with_id, owner, state, reverser_handler)
 
 def decode_handler (eh, msg):
-    print (f"decode handler gets {msg.datum.srepr ()}")
     i = int (msg.datum.raw ())
     if i == 0:
         zd.send_string (eh, "0", "0", msg)
@@ -112,7 +110,19 @@ def decode (reg, owner, name, template_data):
     name_with_id = zd.gensym ("Decode")
     return zd.make_leaf (name_with_id, owner, None, decode_handler)
 
-    
+
+def monitor (reg, owner, name, template_data):      
+    name_with_id = zd.gensym ("?")
+    return zd.make_leaf (name=name_with_id, owner=owner, instance_data=None, handler=monitor_handler)
+def monitor_handler (eh, msg):
+    s = msg.datum.srepr ()
+    if s == "0":
+        print (f"{s}", file=sys.stderr)
+    else:
+        print (f"{s}", end='', file=sys.stderr)
+
+
+
 
 
 
