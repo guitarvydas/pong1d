@@ -39,8 +39,6 @@ def count_handler (eh, msg):
         send_int (eh, "", counter, msg)
     elif msg.port == "rev":
         direction = direction * -1
-    else:
-        panic (f'bad message to count {msg.port}')
 def count (reg, owner, name, template_data):
     name_with_id = zd.gensym ("Count")
     return zd.make_leaf (name_with_id, owner, None, count_handler)
@@ -60,8 +58,6 @@ def reverser_handler (eh, msg):
             reverser_state = "K"
         else:
             pass
-    else:
-        panic ("bad message to reverser handler")
 def reverser (reg, owner, name, template_data):
     name_with_id = zd.gensym ("Reverser")
     return zd.make_leaf (name_with_id, owner, None, reverser_handler)
@@ -72,8 +68,6 @@ def decode_handler (eh, msg):
     i = int (msg.datum.raw ())
     if i >= 0 and i <= 9:
         zd.send_string (eh, digits[i], digits[i], msg)
-    else:
-        panic (f'bad message to decode {i}')
     send_bang (eh, "done", msg)
 def decode (reg, owner, name, template_data):
     name_with_id = zd.gensym ("Decode")
@@ -133,8 +127,4 @@ def send_bang (eh, port, causing_message):
     datum = zd.new_datum_bang ()
     zd.send (eh, port, datum, causing_message)
 
-def panic (s):
-    print (s)
-    sys.exit (1)
-    
 main ()
