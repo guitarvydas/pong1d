@@ -66,28 +66,12 @@ def reverser (reg, owner, name, template_data):
     name_with_id = zd.gensym ("Reverser")
     return zd.make_leaf (name_with_id, owner, None, reverser_handler)
 
+digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 def decode_handler (eh, msg):
+    global digits
     i = int (msg.datum.raw ())
-    if i == 0:
-        zd.send_string (eh, "0", "0", msg)
-    elif i == 1:
-        zd.send_string (eh, "1", "1", msg)
-    elif i == 2:
-        zd.send_string (eh, "2", "2", msg)
-    elif i == 3:
-        zd.send_string (eh, "3", "3", msg)
-    elif i == 4:
-        zd.send_string (eh, "4", "4", msg)
-    elif i == 5:
-        zd.send_string (eh, "5", "5", msg)
-    elif i == 6:
-        zd.send_string (eh, "6", "6", msg)
-    elif i == 7:
-        zd.send_string (eh, "7", "7", msg)
-    elif i == 8:
-        zd.send_string (eh, "8", "8", msg)
-    elif i == 9:
-        zd.send_string (eh, "9", "9", msg)
+    if i >= 0 and i <= 9:
+        zd.send_string (eh, digits[i], digits[i], msg)
     else:
         panic (f'bad message to decode {i}')
     send_bang (eh, "done", msg)
