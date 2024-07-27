@@ -2,9 +2,14 @@
 
 ARG=""
 
-all:
-	./0D/das2json/das2json scanner3.drawio
+strippeddown: scanner3.drawio.json
 	python3 main.py . 0D/python ${ARG} 'main' scanner3.drawio.json
+
+full: scanner3.drawio.json
+	python3 main-full.py . 0D/python ${ARG} 'main' scanner3.drawio.json
+
+scanner3.drawio.json:
+	./0D/das2json/das2json scanner3.drawio
 
 #########
 

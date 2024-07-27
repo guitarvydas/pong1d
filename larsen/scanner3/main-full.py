@@ -30,44 +30,76 @@ def components_to_include_in_project (root_project, root_0D, reg):
 
 ## Leaf component implementations
 
-counter = 0
-direction = 1
+class Counter:
+    def __init__ (self):
+        self.count = 0
+        self.direction = 1
+    def advance (self):
+        self.count += self.direction
+    def reverse (self):
+        self.direction = self.direction * -1
 def count_handler (eh, msg):
-    global counter, direction
+    inst = eh.instance_data
     if msg.port == "adv":
-        counter = counter + direction
-        send_int (eh, "", counter, msg)
+        inst.advance ()
+        send_int (eh, "", inst.count, msg)
     elif msg.port == "rev":
-        direction = direction * -1
+        inst.reverse ()
+    else:
+        panic (f'bad message to count {msg.port}')
 def count (reg, owner, name, template_data):
+    counter = Counter ()
     name_with_id = zd.gensym ("Count")
-    return zd.make_leaf (name_with_id, owner, None, count_handler)
+    return zd.make_leaf (name_with_id, owner, counter, count_handler)
 
-reverser_state = "J"
+class ReverserState:
+    def __init__ (self):
+        self.state = "J"
 def reverser_handler (eh, msg):
-    global reverser_state
-    if reverser_state == "K":
+    inst = eh.instance_data
+    if inst.state == "K":
         if msg.port == "J":
             send_bang (eh, "", msg)
-            reverser_state = "J"
+            inst.state = "J"
         else:
             pass
-    elif reverser_state == "J":
+    elif inst.state == "J":
         if msg.port == "K":
             send_bang (eh, "", msg)
-            reverser_state = "K"
+            inst.state = "K"
         else:
             pass
+    else:
+        panic ("bad message to reverser handler")
 def reverser (reg, owner, name, template_data):
+    state = ReverserState ()
     name_with_id = zd.gensym ("Reverser")
-    return zd.make_leaf (name_with_id, owner, None, reverser_handler)
+    return zd.make_leaf (name_with_id, owner, state, reverser_handler)
 
-digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 def decode_handler (eh, msg):
-    global digits
     i = int (msg.datum.raw ())
-    if i >= 0 and i <= 9:
-        zd.send_string (eh, digits[i], digits[i], msg)
+    if i == 0:
+        zd.send_string (eh, "0", "0", msg)
+    elif i == 1:
+        zd.send_string (eh, "1", "1", msg)
+    elif i == 2:
+        zd.send_string (eh, "2", "2", msg)
+    elif i == 3:
+        zd.send_string (eh, "3", "3", msg)
+    elif i == 4:
+        zd.send_string (eh, "4", "4", msg)
+    elif i == 5:
+        zd.send_string (eh, "5", "5", msg)
+    elif i == 6:
+        zd.send_string (eh, "6", "6", msg)
+    elif i == 7:
+        zd.send_string (eh, "7", "7", msg)
+    elif i == 8:
+        zd.send_string (eh, "8", "8", msg)
+    elif i == 9:
+        zd.send_string (eh, "9", "9", msg)
+    else:
+        panic (f'bad message to decode {i}')
     send_bang (eh, "done", msg)
 def decode (reg, owner, name, template_data):
     name_with_id = zd.gensym ("Decode")
@@ -127,4 +159,8 @@ def send_bang (eh, port, causing_message):
     datum = zd.new_datum_bang ()
     zd.send (eh, port, datum, causing_message)
 
+def panic (s):
+    print (s)
+    sys.exit (1)
+    
 main ()
