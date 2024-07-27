@@ -86,7 +86,7 @@ def monitor_handler (eh, msg):
     print (f"{s}")
 
     
-DELAYDELAY = 10000
+DELAYDELAY = 50000
 
 class Delay_Info:
     def __init__ (self, counter=0, saved_message=None):
